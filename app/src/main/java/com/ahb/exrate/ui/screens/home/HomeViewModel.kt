@@ -7,7 +7,12 @@ import com.ahb.exrate.repository.CurrencyRateRepository
 import com.ahb.exrate.repository.datastore.SelectedAssetsStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,7 +58,7 @@ class HomeViewModel @Inject constructor(
         )
 
     init {
-        // Kick off an automatic refresh every 5 seconds
+        // Automatic refresh every 5 seconds
         viewModelScope.launch {
             while (true) {
                 currencyRateRepository.fetchRates()
@@ -63,7 +68,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /** User pulled to refresh: re-fetch rates immediately */
+    /** Manual pull‑to‑refresh */
     fun onPullToRefreshTrigger() {
         viewModelScope.launch {
             _isRefreshing.value = true
