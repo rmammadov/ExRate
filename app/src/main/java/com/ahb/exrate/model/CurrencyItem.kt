@@ -10,5 +10,6 @@ data class CurrencyItem(
     val name: String,
     val rate: String,
     val change: String,
-    val type: CurrencyType
+    val type: CurrencyType,
+    val isSelected: Boolean = false
 )

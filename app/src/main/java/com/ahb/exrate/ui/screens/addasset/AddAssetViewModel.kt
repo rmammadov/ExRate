@@ -17,73 +17,57 @@ class AddAssetViewModel @Inject constructor(
     private val selectedStore: SelectedAssetsStore
 ) : ViewModel() {
 
-    // --- Search query state ---
+    // raw rates
+    private val ratesFlow = currencyRateRepository.observeRates()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    // current selected codes
+    private val selectedCodes = selectedStore.selectedCodes
+
+    // combine to set isSelected
+    private val ratesWithSelection = combine(ratesFlow, selectedCodes) { rates, codes ->
+        rates.map { it.copy(isSelected = codes.contains(it.code)) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    // split fiat / crypto
+    val fiatAssets: StateFlow<List<CurrencyItem>> = ratesWithSelection
+        .map { it.filter { c -> c.type == CurrencyType.FIAT } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val cryptoAssets: StateFlow<List<CurrencyItem>> = ratesWithSelection
+        .map { it.filter { c -> c.type == CurrencyType.CRYPTO } }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    // search + refresh
     private val _searchQuery = MutableStateFlow("")
-    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+    val searchQuery = _searchQuery.asStateFlow()
 
-    // --- Unified rates flow from repository ---
-    private val ratesFlow: StateFlow<List<CurrencyItem>> =
-        currencyRateRepository
-            .observeRates()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
-
-    // --- Fiat assets (type == FIAT) ---
-    val fiatAssets: StateFlow<List<CurrencyItem>> = ratesFlow
-        .map { rates -> rates.filter { it.type == CurrencyType.FIAT } }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    // --- Crypto assets (type == CRYPTO) ---
-    val cryptoAssets: StateFlow<List<CurrencyItem>> = ratesFlow
-        .map { rates -> rates.filter { it.type == CurrencyType.CRYPTO } }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = emptyList()
-        )
-
-    // --- User’s selection set ---
-    private val _selectedAssets = MutableStateFlow<Set<CurrencyItem>>(emptySet())
-    val selectedAssets: StateFlow<Set<CurrencyItem>> = _selectedAssets.asStateFlow()
-
-    // --- Pull‑to‑refresh state ---
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+    val isRefreshing = _isRefreshing.asStateFlow()
 
     init {
-        // Initial load: fetch both fiat and crypto rates
         viewModelScope.launch {
             currencyRateRepository.fetchFiatRates()
             currencyRateRepository.fetchCryptoRates()
         }
     }
 
-    /** Update search query as user types */
-    fun onSearchQueryChanged(newQuery: String) {
-        _searchQuery.value = newQuery
-    }
+    fun onSearchQueryChanged(q: String) { _searchQuery.value = q }
 
-    /** Toggle presence of an asset in the selection set */
     fun toggleAsset(asset: CurrencyItem) {
-        _selectedAssets.update { current ->
-            if (current.contains(asset)) current - asset
-            else current + asset
-        }
+        // directly update the shared store
+        selectedStore.updateSelected(
+            selectedCodes.value.let { set ->
+                if (asset.code in set) set - asset.code
+                else set + asset.code
+            }
+        )
     }
 
-    /** Called when user taps “Done” */
     fun confirmSelection() {
-        selectedStore.updateSelected(_selectedAssets.value.map { it.code }.toSet())
+        // no-op: store is already up to date
     }
 
-    /** Trigger a manual refresh of rates (for pull‑to‑refresh) */
     fun onPullToRefreshTrigger() {
         viewModelScope.launch {
             _isRefreshing.value = true

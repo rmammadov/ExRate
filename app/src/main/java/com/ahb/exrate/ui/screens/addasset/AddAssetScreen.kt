@@ -32,25 +32,21 @@ fun AddAssetScreen(
     navController: NavController,
     addAssetViewModel: AddAssetViewModel = hiltViewModel()
 ) {
-    val popularAssets by addAssetViewModel.fiatAssets.collectAsState()
-    val cryptoAssets by addAssetViewModel.cryptoAssets.collectAsState()
-    val selectedAssets by addAssetViewModel.selectedAssets.collectAsState()
-    val searchQuery by addAssetViewModel.searchQuery.collectAsState()
-    val isRefreshing    by addAssetViewModel.isRefreshing.collectAsState()
+    val fiatAssets    by addAssetViewModel.fiatAssets.collectAsState()
+    val cryptoAssets  by addAssetViewModel.cryptoAssets.collectAsState()
+    val searchQuery   by addAssetViewModel.searchQuery.collectAsState()
+    val isRefreshing  by addAssetViewModel.isRefreshing.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Add Asset") },
                 navigationIcon = {
-                    IconButton(
-                        onClick = {
-                            // only pop if there *is* a previous entry
-                            if (navController.previousBackStackEntry != null) {
-                                navController.popBackStack()
-                            }
+                    IconButton(onClick = {
+                        if (navController.previousBackStackEntry != null) {
+                            navController.popBackStack()
                         }
-                    ) {
+                    }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 },
@@ -62,7 +58,7 @@ fun AddAssetScreen(
                                 navController.popBackStack()
                             }
                         },
-                        enabled = selectedAssets.isNotEmpty()
+                        enabled = searchQuery.isNotBlank() || fiatAssets.any { it.isSelected } || cryptoAssets.any { it.isSelected }
                     ) {
                         Text("Done")
                     }
@@ -109,8 +105,8 @@ fun AddAssetScreen(
                             code.contains(searchQuery, ignoreCase = true) ||
                                     name.contains(searchQuery, ignoreCase = true)
 
-                        val filteredPopular = popularAssets.filter { it.matches() }
-                        if (filteredPopular.isNotEmpty()) {
+                        val filteredFiat = fiatAssets.filter { it.matches() }
+                        if (filteredFiat.isNotEmpty()) {
                             item {
                                 Text(
                                     "POPULAR ASSETS",
@@ -121,10 +117,9 @@ fun AddAssetScreen(
                                         .padding(start = 16.dp, bottom = 4.dp)
                                 )
                             }
-                            items(filteredPopular) { asset ->
+                            items(filteredFiat) { asset ->
                                 AssetRow(
                                     asset = asset,
-                                    selected = selectedAssets.contains(asset),
                                     onClick = { addAssetViewModel.toggleAsset(asset) }
                                 )
                             }
@@ -145,7 +140,6 @@ fun AddAssetScreen(
                             items(filteredCrypto) { asset ->
                                 AssetRow(
                                     asset = asset,
-                                    selected = selectedAssets.contains(asset),
                                     onClick = { addAssetViewModel.toggleAsset(asset) }
                                 )
                             }
@@ -160,7 +154,6 @@ fun AddAssetScreen(
 @Composable
 private fun AssetRow(
     asset: CurrencyItem,
-    selected: Boolean,
     onClick: () -> Unit
 ) {
     Row(
@@ -204,7 +197,7 @@ private fun AssetRow(
         }
 
         RadioButton(
-            selected = selected,
+            selected = asset.isSelected,
             onClick = onClick
         )
     }
