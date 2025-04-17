@@ -32,7 +32,7 @@ fun AddAssetScreen(
     navController: NavController,
     addAssetViewModel: AddAssetViewModel = hiltViewModel()
 ) {
-    val popularAssets by addAssetViewModel.popularAssets.collectAsState()
+    val popularAssets by addAssetViewModel.fiatAssets.collectAsState()
     val cryptoAssets by addAssetViewModel.cryptoAssets.collectAsState()
     val selectedAssets by addAssetViewModel.selectedAssets.collectAsState()
     val searchQuery by addAssetViewModel.searchQuery.collectAsState()

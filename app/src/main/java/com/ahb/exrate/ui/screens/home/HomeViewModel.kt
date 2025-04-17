@@ -46,7 +46,8 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _isRefreshing.value = true
-            currencyRateRepository.fetchRates()
+            currencyRateRepository.fetchFiatRates()
+            currencyRateRepository.fetchCryptoRates()
             _lastUpdated.value   = System.currentTimeMillis()
             _isRefreshing.value = false
         }
@@ -55,7 +56,8 @@ class HomeViewModel @Inject constructor(
     fun onPullToRefreshTrigger() {
         viewModelScope.launch {
             _isRefreshing.update { true }
-            currencyRateRepository.fetchRates()
+            currencyRateRepository.fetchFiatRates()
+            currencyRateRepository.fetchCryptoRates()
             _lastUpdated.update { System.currentTimeMillis() }
             _isRefreshing.update { false }
         }

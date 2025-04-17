@@ -3,6 +3,7 @@ package com.ahb.exrate.ui.screens.addasset
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ahb.exrate.model.CurrencyItem
+import com.ahb.exrate.model.CurrencyType
 import com.ahb.exrate.repository.CurrencyRateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -14,9 +15,11 @@ class AddAssetViewModel @Inject constructor(
     private val currencyRateRepository: CurrencyRateRepository
 ) : ViewModel() {
 
+    // --- Search query state ---
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
+    // --- Unified rates flow from repository ---
     private val ratesFlow: StateFlow<List<CurrencyItem>> =
         currencyRateRepository
             .observeRates()
@@ -26,31 +29,37 @@ class AddAssetViewModel @Inject constructor(
                 initialValue = emptyList()
             )
 
-    val popularAssets: StateFlow<List<CurrencyItem>> = ratesFlow
-        .map { rates -> rates.filter { it.code != "BTC" } }
+    // --- Fiat assets (type == FIAT) ---
+    val fiatAssets: StateFlow<List<CurrencyItem>> = ratesFlow
+        .map { rates -> rates.filter { it.type == CurrencyType.FIAT } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
 
+    // --- Crypto assets (type == CRYPTO) ---
     val cryptoAssets: StateFlow<List<CurrencyItem>> = ratesFlow
-        .map { rates -> rates.filter { it.code == "BTC" } }
+        .map { rates -> rates.filter { it.type == CurrencyType.CRYPTO } }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = emptyList()
         )
 
+    // --- User’s selection set ---
     private val _selectedAssets = MutableStateFlow<Set<CurrencyItem>>(emptySet())
     val selectedAssets: StateFlow<Set<CurrencyItem>> = _selectedAssets.asStateFlow()
 
+    // --- Pull‑to‑refresh state ---
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     init {
+        // Initial load: fetch both fiat and crypto rates
         viewModelScope.launch {
-            currencyRateRepository.fetchRates()
+            currencyRateRepository.fetchFiatRates()
+            currencyRateRepository.fetchCryptoRates()
         }
     }
 
@@ -77,7 +86,8 @@ class AddAssetViewModel @Inject constructor(
         viewModelScope.launch {
             _isRefreshing.value = true
             try {
-                currencyRateRepository.fetchRates()
+                currencyRateRepository.fetchFiatRates()
+                currencyRateRepository.fetchCryptoRates()
             } finally {
                 _isRefreshing.value = false
             }
