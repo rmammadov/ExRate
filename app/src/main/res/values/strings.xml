@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ExRate (Test)</string>
+
+    <!-- Bottom Navigation -->
+    <string name="bottom_nav_home">Home</string>
+    <string name="bottom_nav_favorites">Favorites</string>
+    <string name="bottom_nav_markets">Markets</string>
+    <string name="bottom_nav_settings">Settings</string>
+
+    <!-- No Internet Screen -->
+    <string name="no_internet_connection">İnternet bağlantısı yoxdur</string>
+    <string name="no_internet_connection_message">Zəhmət olmasa internet bağlantınızı yoxlayın və yenidən cəhd edin.</string>
+</resources>
