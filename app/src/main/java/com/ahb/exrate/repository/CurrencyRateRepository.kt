@@ -12,10 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class CurrencyRateRepository {
 
-    // Backing MutableStateFlow holding the list of currency items.
     private val _rates = MutableStateFlow<List<CurrencyItem>>(emptyList())
-
-    // Exposed Flow for the list of currency items.
     val ratesFlow: Flow<List<CurrencyItem>> = _rates.asStateFlow()
 
     // A mix of fiat & crypto for simulation
@@ -44,16 +41,9 @@ class CurrencyRateRepository {
         CurrencyItem("MATIC","Polygon",         "1.1500",    "-0.20%",  CurrencyType.CRYPTO)
     )
 
-    /** Simulates a network call to fetch currency rates. */
-    suspend fun fetchFiatRates() {
-        delay(2_000)     // fake network latency
-        _rates.value = dummyRatesFiat
-    }
-
-    /** Simulates a network call to fetch currency rates. */
-    suspend fun fetchCryptoRates() {
-        delay(2_000)     // fake network latency
-        _rates.value = dummyRatesCrypto
+    suspend fun fetchRates() {
+        delay(2_000)
+        _rates.value = dummyRatesFiat + dummyRatesCrypto
     }
 
     /** Returns the Flow of currency items. */

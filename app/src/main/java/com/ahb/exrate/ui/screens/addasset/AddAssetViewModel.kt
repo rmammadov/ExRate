@@ -47,8 +47,7 @@ class AddAssetViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            currencyRateRepository.fetchFiatRates()
-            currencyRateRepository.fetchCryptoRates()
+            currencyRateRepository.fetchRates()
         }
     }
 
@@ -67,8 +66,7 @@ class AddAssetViewModel @Inject constructor(
         viewModelScope.launch {
             _isRefreshing.value = true
             try {
-                currencyRateRepository.fetchFiatRates()
-                currencyRateRepository.fetchCryptoRates()
+                currencyRateRepository.fetchRates()
             } finally {
                 _isRefreshing.value = false
             }
