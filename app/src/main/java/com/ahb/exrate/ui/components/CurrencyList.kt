@@ -1,3 +1,4 @@
+// CurrencyList.kt
 package com.ahb.exrate.ui.components
 
 import androidx.compose.foundation.background
@@ -19,9 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ahb.exrate.R
 import com.ahb.exrate.model.CurrencyItem
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -64,12 +67,12 @@ fun CurrencyList(
                             .fillMaxSize()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF424957)), // your dark swipe‐background
+                            .background(Color(0xFF424957)),
                         contentAlignment = alignment
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Remove currency",
+                            contentDescription = stringResource(R.string.remove_currency),
                             tint = Color.White,
                             modifier = Modifier.padding(horizontal = 24.dp)
                         )
@@ -84,7 +87,7 @@ fun CurrencyList(
         item {
             Spacer(modifier = Modifier.height(24.dp))
             Text(
-                text = "⇆ Swipe left to remove currency",
+                text = stringResource(R.string.swipe_to_remove_hint),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),

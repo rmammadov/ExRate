@@ -17,12 +17,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ahb.exrate.R
 import com.ahb.exrate.model.CurrencyItem
 import com.ahb.exrate.ui.components.PullToRefreshWrapper
 
@@ -40,34 +42,38 @@ fun AddAssetScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Asset") },
+                title = { Text(stringResource(R.string.add_asset_title)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         if (navController.previousBackStackEntry != null) {
                             navController.popBackStack()
                         }
                     }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
                     }
                 },
                 actions = {
                     TextButton(
                         onClick = {
-                            addAssetViewModel.confirmSelection()
                             if (navController.previousBackStackEntry != null) {
                                 navController.popBackStack()
                             }
                         },
-                        enabled = searchQuery.isNotBlank() || fiatAssets.any { it.isSelected } || cryptoAssets.any { it.isSelected }
+                        enabled = searchQuery.isNotBlank()
+                                || fiatAssets.any { it.isSelected }
+                                || cryptoAssets.any { it.isSelected }
                     ) {
-                        Text("Done")
+                        Text(stringResource(R.string.done))
                     }
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = Color.White,
-                    titleContentColor = Color.Black,
-                    navigationIconContentColor = Color.Black,
-                    actionIconContentColor = Color.Black
+                    containerColor               = Color.White,
+                    titleContentColor            = Color.Black,
+                    navigationIconContentColor   = Color.Black,
+                    actionIconContentColor       = Color.Black
                 )
             )
         },
@@ -79,11 +85,11 @@ fun AddAssetScreen(
                 .fillMaxSize()
         ) {
             OutlinedTextField(
-                value = TextFieldValue(searchQuery),
+                value       = TextFieldValue(searchQuery),
                 onValueChange = { addAssetViewModel.onSearchQueryChanged(it.text) },
-                placeholder = { Text("Search assets") },
-                singleLine = true,
-                modifier = Modifier
+                placeholder = { Text(stringResource(R.string.search_assets)) },
+                singleLine  = true,
+                modifier    = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             )
@@ -91,14 +97,11 @@ fun AddAssetScreen(
             Box(modifier = Modifier.fillMaxSize()) {
                 PullToRefreshWrapper(
                     isRefreshing = isRefreshing,
-                    onRefresh = { addAssetViewModel.onPullToRefreshTrigger() }
+                    onRefresh    = { addAssetViewModel.onPullToRefreshTrigger() }
                 ) {
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            horizontal = 16.dp,
-                            vertical = 16.dp
-                        ),
+                        modifier          = Modifier.fillMaxSize(),
+                        contentPadding    = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         fun CurrencyItem.matches() =
@@ -109,9 +112,9 @@ fun AddAssetScreen(
                         if (filteredFiat.isNotEmpty()) {
                             item {
                                 Text(
-                                    "POPULAR ASSETS",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color.Gray,
+                                    stringResource(R.string.popular_assets),
+                                    style    = MaterialTheme.typography.labelSmall,
+                                    color    = Color.Gray,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(start = 16.dp, bottom = 4.dp)
@@ -119,7 +122,7 @@ fun AddAssetScreen(
                             }
                             items(filteredFiat) { asset ->
                                 AssetRow(
-                                    asset = asset,
+                                    asset   = asset,
                                     onClick = { addAssetViewModel.toggleAsset(asset) }
                                 )
                             }
@@ -129,9 +132,9 @@ fun AddAssetScreen(
                         if (filteredCrypto.isNotEmpty()) {
                             item {
                                 Text(
-                                    "CRYPTOCURRENCIES",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color.Gray,
+                                    stringResource(R.string.cryptocurrencies),
+                                    style    = MaterialTheme.typography.labelSmall,
+                                    color    = Color.Gray,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
@@ -139,7 +142,7 @@ fun AddAssetScreen(
                             }
                             items(filteredCrypto) { asset ->
                                 AssetRow(
-                                    asset = asset,
+                                    asset   = asset,
                                     onClick = { addAssetViewModel.toggleAsset(asset) }
                                 )
                             }
@@ -167,17 +170,17 @@ private fun AssetRow(
     ) {
         // icon circle
         Box(
-            modifier = Modifier
+            modifier        = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
                 .background(Color(0xFF333744)),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = asset.code.firstOrNull()?.toString() ?: "?",
-                color = Color.White,
+                text       = asset.code.firstOrNull()?.toString() ?: "?",
+                color      = Color.White,
                 fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontSize   = 16.sp
             )
         }
 
@@ -185,20 +188,20 @@ private fun AssetRow(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = asset.code,
+                text       = asset.code,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 16.sp
+                fontSize   = 16.sp
             )
             Text(
-                text = asset.name,
-                color = Color.Gray,
+                text     = asset.name,
+                color    = Color.Gray,
                 fontSize = 13.sp
             )
         }
 
         RadioButton(
             selected = asset.isSelected,
-            onClick = onClick
+            onClick  = onClick
         )
     }
 }

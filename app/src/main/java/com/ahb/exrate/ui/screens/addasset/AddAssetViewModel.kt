@@ -55,17 +55,12 @@ class AddAssetViewModel @Inject constructor(
     fun onSearchQueryChanged(q: String) { _searchQuery.value = q }
 
     fun toggleAsset(asset: CurrencyItem) {
-        // directly update the shared store
         selectedStore.updateSelected(
             selectedCodes.value.let { set ->
                 if (asset.code in set) set - asset.code
                 else set + asset.code
             }
         )
-    }
-
-    fun confirmSelection() {
-        // no-op: store is already up to date
     }
 
     fun onPullToRefreshTrigger() {
