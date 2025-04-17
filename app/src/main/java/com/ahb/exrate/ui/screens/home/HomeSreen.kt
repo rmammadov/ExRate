@@ -63,7 +63,9 @@ fun HomeScreen(
                 ) {
                     CurrencyList(
                         items        = screenState.items,
-                        onRemoveItem = { /* TODO: wire up removal if desired */ }
+                        onRemoveItem = {
+                            homeViewModel.onRemoveItem(it)
+                        }
                     )
                 }
             }

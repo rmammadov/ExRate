@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ahb.exrate.model.CurrencyItem
 import com.ahb.exrate.model.CurrencyType
 import com.ahb.exrate.repository.CurrencyRateRepository
+import com.ahb.exrate.repository.datastore.SelectedAssetsStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -12,7 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddAssetViewModel @Inject constructor(
-    private val currencyRateRepository: CurrencyRateRepository
+    private val currencyRateRepository: CurrencyRateRepository,
+    private val selectedStore: SelectedAssetsStore
 ) : ViewModel() {
 
     // --- Search query state ---
@@ -78,7 +80,7 @@ class AddAssetViewModel @Inject constructor(
 
     /** Called when user taps “Done” */
     fun confirmSelection() {
-        // TODO: persist selectedAssets or pass back via NavController
+        selectedStore.updateSelected(_selectedAssets.value.map { it.code }.toSet())
     }
 
     /** Trigger a manual refresh of rates (for pull‑to‑refresh) */
