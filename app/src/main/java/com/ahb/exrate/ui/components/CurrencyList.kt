@@ -26,6 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ahb.exrate.R
 import com.ahb.exrate.model.CurrencyItem
+import com.ahb.exrate.ui.theme.BackgroundColorDark
+import com.ahb.exrate.ui.theme.BackgroundListItem
+import com.ahb.exrate.ui.theme.ColorGray
+import com.ahb.exrate.ui.theme.ColorWhite
+import com.ahb.exrate.ui.theme.DownColor
+import com.ahb.exrate.ui.theme.UpColor
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -67,13 +73,13 @@ fun CurrencyList(
                             .fillMaxSize()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF424957)),
+                            .background(BackgroundColorDark),
                         contentAlignment = alignment
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = stringResource(R.string.remove_currency),
-                            tint = Color.White,
+                            tint = ColorWhite,
                             modifier = Modifier.padding(horizontal = 24.dp)
                         )
                     }
@@ -92,7 +98,7 @@ fun CurrencyList(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 textAlign = TextAlign.Center,
-                color = Color.Gray,
+                color = ColorGray,
                 fontSize = 12.sp
             )
         }
@@ -105,7 +111,7 @@ private fun CurrencyListItem(currency: CurrencyItem) {
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .background(ColorWhite)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -113,12 +119,12 @@ private fun CurrencyListItem(currency: CurrencyItem) {
             modifier = Modifier
                 .size(44.dp)
                 .clip(RoundedCornerShape(50))
-                .background(Color(0xFF333744)),
+                .background(BackgroundListItem),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = currency.code.firstOrNull()?.toString() ?: "?",
-                color = Color.White,
+                color = ColorWhite,
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
             )
         }
@@ -134,7 +140,7 @@ private fun CurrencyListItem(currency: CurrencyItem) {
             Text(
                 text = currency.name,
                 fontSize = 13.sp,
-                color = Color.Gray
+                color = ColorGray
             )
         }
 
@@ -146,7 +152,7 @@ private fun CurrencyListItem(currency: CurrencyItem) {
             )
             Text(
                 text = currency.change,
-                color = if (currency.change.startsWith("+")) Color(0xFF4CAF50) else Color(0xFFF44336),
+                color = if (currency.change.startsWith("+")) UpColor else DownColor,
                 fontSize = 13.sp
             )
         }

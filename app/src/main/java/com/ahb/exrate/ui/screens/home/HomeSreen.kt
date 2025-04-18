@@ -6,11 +6,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ahb.exrate.R
 import com.ahb.exrate.ui.components.*
+import com.ahb.exrate.ui.components.navigation.Routes
+import com.ahb.exrate.ui.theme.BackgroundColor
 import kotlinx.coroutines.delay
 
 @Composable
@@ -33,9 +36,9 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBarWithPlus { navController.navigate("add_asset") }
+            TopAppBarWithPlus { navController.navigate(Routes.ADD_ASSET) }
         },
-        containerColor = Color(0xFFF2F2F2)
+        containerColor = BackgroundColor
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -44,7 +47,7 @@ fun HomeScreen(
                 .padding(horizontal = 16.dp)
         ) {
             Text(
-                text = "Last updated: $elapsedSeconds seconds ago",
+                text = stringResource(R.string.last_updated) + " " + elapsedSeconds + " " + stringResource(R.string.seconds_ago),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(vertical = 8.dp)
             )

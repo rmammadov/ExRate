@@ -18,25 +18,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.ahb.exrate.R
+import com.ahb.exrate.ui.theme.ColorWhite
+import com.ahb.exrate.ui.theme.DarkTextColor
+import com.ahb.exrate.ui.theme.LightCircleColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarWithPlus(
     onAddClicked: () -> Unit = {}
 ) {
-    val darkTextColor    = Color(0xFF111827)
-    val lightCircleColor = Color(0xFFF2F2F2)
-
     TopAppBar(
         title = {
             Text(
                 text  = stringResource(R.string.exchange_rates_title),
                 style = MaterialTheme.typography.titleLarge,
-                color = darkTextColor
+                color = DarkTextColor
             )
         },
         actions = {
@@ -45,19 +44,19 @@ fun TopAppBarWithPlus(
                     modifier        = Modifier
                         .size(36.dp)
                         .clip(CircleShape)
-                        .background(lightCircleColor),
+                        .background(LightCircleColor),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector   = Icons.Default.Add,
                         contentDescription = stringResource(R.string.add_icon_description),
-                        tint          = darkTextColor
+                        tint          = DarkTextColor
                     )
                 }
             }
         },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = Color.White
+            containerColor = ColorWhite
         )
     )
 }

@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +26,11 @@ import androidx.navigation.NavController
 import com.ahb.exrate.R
 import com.ahb.exrate.model.CurrencyItem
 import com.ahb.exrate.ui.components.PullToRefreshWrapper
+import com.ahb.exrate.ui.theme.BackgroundColor
+import com.ahb.exrate.ui.theme.BackgroundColorDarker
+import com.ahb.exrate.ui.theme.ColorBlack
+import com.ahb.exrate.ui.theme.ColorGray
+import com.ahb.exrate.ui.theme.ColorWhite
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,14 +74,14 @@ fun AddAssetScreen(
                     }
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor               = Color.White,
-                    titleContentColor            = Color.Black,
-                    navigationIconContentColor   = Color.Black,
-                    actionIconContentColor       = Color.Black
+                    containerColor               = ColorWhite,
+                    titleContentColor            = ColorBlack,
+                    navigationIconContentColor   = ColorBlack,
+                    actionIconContentColor       = ColorBlack
                 )
             )
         },
-        containerColor = Color(0xFFF2F2F2)
+        containerColor = BackgroundColor
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -114,7 +118,7 @@ fun AddAssetScreen(
                                 Text(
                                     stringResource(R.string.popular_assets),
                                     style    = MaterialTheme.typography.labelSmall,
-                                    color    = Color.Gray,
+                                    color    = ColorGray,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(start = 16.dp, bottom = 4.dp)
@@ -134,7 +138,7 @@ fun AddAssetScreen(
                                 Text(
                                     stringResource(R.string.cryptocurrencies),
                                     style    = MaterialTheme.typography.labelSmall,
-                                    color    = Color.Gray,
+                                    color    = ColorGray,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(start = 16.dp, top = 8.dp, bottom = 4.dp)
@@ -163,7 +167,7 @@ private fun AssetRow(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.White)
+            .background(ColorWhite)
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -173,12 +177,12 @@ private fun AssetRow(
             modifier        = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF333744)),
+                .background(BackgroundColorDarker),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text       = asset.code.firstOrNull()?.toString() ?: "?",
-                color      = Color.White,
+                color      = ColorWhite,
                 fontWeight = FontWeight.Bold,
                 fontSize   = 16.sp
             )
@@ -194,7 +198,7 @@ private fun AssetRow(
             )
             Text(
                 text     = asset.name,
-                color    = Color.Gray,
+                color    = ColorGray,
                 fontSize = 13.sp
             )
         }

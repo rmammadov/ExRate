@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -21,6 +20,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.ahb.exrate.R
 import com.ahb.exrate.ui.components.navigation.Routes
+import com.ahb.exrate.ui.theme.ColorDarkGray
+import com.ahb.exrate.ui.theme.ColorWhite
 import kotlinx.coroutines.delay
 
 @Composable
@@ -41,7 +42,7 @@ fun SplashScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.DarkGray),
+            .background(ColorDarkGray),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -52,14 +53,14 @@ fun SplashScreen(
                 text      = stringResource(R.string.splash_icon),
                 fontSize  = 96.sp,
                 fontWeight= FontWeight.ExtraBold,
-                color     = Color.White
+                color     = ColorDarkGray
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text      = stringResource(R.string.splash_title),
                 fontSize  = 24.sp,
                 fontWeight= FontWeight.Bold,
-                color     = Color.White
+                color     = ColorWhite
             )
         }
     }
