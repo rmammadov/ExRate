@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,7 +54,7 @@ fun SplashScreen(
                 text      = stringResource(R.string.splash_icon),
                 fontSize  = 96.sp,
                 fontWeight= FontWeight.ExtraBold,
-                color     = ColorDarkGray
+                color     = ColorWhite
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(

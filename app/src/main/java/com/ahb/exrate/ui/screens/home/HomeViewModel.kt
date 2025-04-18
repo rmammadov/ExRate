@@ -22,53 +22,48 @@ class HomeViewModel @Inject constructor(
     private val selectedStore: SelectedAssetsStore
 ) : ViewModel() {
 
-    // --- Refresh + timestamp state ---
-    private val _isRefreshing = MutableStateFlow(false)
+    private val _isRefreshing = MutableStateFlow(true)    // start “loading”
     val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     private val _lastUpdated = MutableStateFlow(System.currentTimeMillis())
     val lastUpdated: StateFlow<Long> = _lastUpdated.asStateFlow()
 
-    // --- Raw rates from the repository ---
-    private val allRates: StateFlow<List<CurrencyItem>> =
-        currencyRateRepository.observeRates()
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
+    private val allRates = currencyRateRepository
+        .observeRates()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // --- Combined UI state: only show rates whose codes are in selectedStore ---
     val screenState: StateFlow<HomeScreenState> = combine(
         allRates,
         selectedStore.selectedCodes,
         isRefreshing,
         lastUpdated
-    ) { rates, selectedCodes, refreshing, lastTs ->
+    ) { rates, codes, refreshing, lastTs ->
         HomeScreenState(
-            items        = rates.filter { it.code in selectedCodes },
+            items        = rates.filter { it.code in codes },
             isRefreshing = refreshing,
             lastUpdated  = lastTs
         )
     }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = HomeScreenState()
-        )
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeScreenState())
 
     init {
-        // Automatic refresh every 5 seconds
+        // Initial load, show progress bar
         viewModelScope.launch {
-            while (true) {
+            try {
                 currencyRateRepository.fetchRates()
                 _lastUpdated.value = System.currentTimeMillis()
+            } finally {
+                _isRefreshing.value = false
+            }
+            // Then background auto-refresh every 5s, without toggling the bar
+            while (true) {
                 delay(5_000L)
+                currencyRateRepository.fetchRates()
+                _lastUpdated.value = System.currentTimeMillis()
             }
         }
     }
 
-    /** Manual pull‑to‑refresh */
     fun onPullToRefreshTrigger() {
         viewModelScope.launch {
             _isRefreshing.value = true
@@ -81,11 +76,11 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    /** Remove an asset from the selected set */
     fun onRemoveItem(asset: CurrencyItem) {
         viewModelScope.launch {
-            val current = selectedStore.selectedCodes.value
-            selectedStore.updateSelected(current - asset.code)
+            selectedStore.updateSelected(
+                selectedStore.selectedCodes.value - asset.code
+            )
         }
     }
 }

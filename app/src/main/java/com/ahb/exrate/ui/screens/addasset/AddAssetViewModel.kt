@@ -21,15 +21,15 @@ class AddAssetViewModel @Inject constructor(
     private val ratesFlow = currencyRateRepository.observeRates()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // current selected codes
+    // selected codes
     private val selectedCodes = selectedStore.selectedCodes
 
-    // combine to set isSelected
+    // annotate isSelected
     private val ratesWithSelection = combine(ratesFlow, selectedCodes) { rates, codes ->
         rates.map { it.copy(isSelected = codes.contains(it.code)) }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // split fiat / crypto
+    // split FIAT / CRYPTO
     val fiatAssets: StateFlow<List<CurrencyItem>> = ratesWithSelection
         .map { it.filter { c -> c.type == CurrencyType.FIAT } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
@@ -38,20 +38,21 @@ class AddAssetViewModel @Inject constructor(
         .map { it.filter { c -> c.type == CurrencyType.CRYPTO } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    // search + refresh
+    // search
     private val _searchQuery = MutableStateFlow("")
     val searchQuery = _searchQuery.asStateFlow()
 
+    // refresh state (used both for initial load and pull‑to‑refresh)
     private val _isRefreshing = MutableStateFlow(false)
-    val isRefreshing = _isRefreshing.asStateFlow()
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            currencyRateRepository.fetchRates()
-        }
+        onPullToRefreshTrigger()
     }
 
-    fun onSearchQueryChanged(q: String) { _searchQuery.value = q }
+    fun onSearchQueryChanged(q: String) {
+        _searchQuery.value = q
+    }
 
     fun toggleAsset(asset: CurrencyItem) {
         selectedStore.updateSelected(
@@ -62,6 +63,7 @@ class AddAssetViewModel @Inject constructor(
         )
     }
 
+    /** Used for both initial load *and* user pull‑to‑refresh */
     fun onPullToRefreshTrigger() {
         viewModelScope.launch {
             _isRefreshing.value = true
